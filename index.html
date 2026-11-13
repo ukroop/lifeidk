@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Истории жизни 🎬</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #831843 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #fff;
+  }
+  .card {
+    background: rgba(255,255,255,.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 28px;
+    padding: 36px 30px;
+    max-width: 620px;
+    width: 100%;
+    box-shadow: 0 24px 80px rgba(0,0,0,.5);
+    text-align: center;
+  }
+  h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: .5px; }
+  .sub { color: #c4b5fd; font-size: 14px; margin-bottom: 28px; }
+  .choices { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .choice-btn {
+    border: 2px solid rgba(196,181,253,.5);
+    background: rgba(255,255,255,.05);
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 16px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all .25s;
+    font-weight: 600;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .choice-btn:hover {
+    background: rgba(139,92,246,.35);
+    border-color: #a78bfa;
+    transform: translateX(4px);
+  }
+  .choice-btn .emoji { font-size: 22px; }
+  .divider { color: #7c6bb0; font-size: 13px; margin: 8px 0 16px; }
+  .input-row { display: flex; gap: 10px; margin-bottom: 24px; }
+  input {
+    flex: 1;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 2px solid rgba(196,181,253,.4);
+    background: rgba(0,0,0,.25);
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border .2s;
+  }
+  input::placeholder { color: #9a8fc4; }
+  input:focus { border-color: #a78bfa; }
+  .go-btn {
+    padding: 14px 22px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .go-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(236,72,153,.4);
+  }
+  .stage {
+    min-height: 120px;
+    border-radius: 18px;
+    background: rgba(0,0,0,.25);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #ddd6fe;
+  }
+  .stage.error {
+    color: #fda4af;
+    font-size: 20px;
+    font-weight: 700;
+    animation: shake .4s ease;
+  }
+  .stage.story {
+    color: #fff;
+    flex-direction: column;
+    gap: 14px;
+    animation: fadeUp .6s ease;
+  }
+  .story-title {
+    font-size: 20px;
+    font-weight: 800;
+    background: linear-gradient(90deg,#a78bfa,#f472b6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .story-text { font-size: 15px; color: #ddd6fe; }
+  .progress {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,.15);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg,#8b5cf6,#ec4899);
+    border-radius: 6px;
+    transition: width .2s linear;
+  }
+  .controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .ctrl-btn {
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 2px solid rgba(167,139,250,.6);
+    background: rgba(139,92,246,.2);
+    color: #e9d5ff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .ctrl-btn:hover {
+    background: rgba(139,92,246,.45);
+    border-color: #c4b5fd;
+  }
+  .reset {
+    margin-top: 16px;
+    background: none;
+    border: none;
+    color: #a78bfa;
+    cursor: pointer;
+    font-size: 13px;
+    text-decoration: underline;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>🎬 Истории жизни</h1>
+  <div class="sub">Маленькие анимации на 6–7 минут о жизни людей. Выбери пару — и смотри.</div>
+
+  <div class="choices">
+    <button class="choice-btn" data-choice="veronika_artem">
+      <span class="emoji">💜</span> Вероника и Артём
+    </button>
+    <button class="choice-btn" data-choice="ruslan">
+      <span class="emoji">🖤</span> Руслан и кто-то…
+    </button>
+  </div>
+
+  <div class="divider">— или введи имя вручную —</div>
+
+  <div class="input-row">
+    <input id="nameInput" type="text" placeholder="Например: Руслан" />
+    <button class="go-btn" id="goBtn">Поехали</button>
+  </div>
+
+  <div class="stage" id="stage">
+    Пока ничего не выбрано. Жду твой выбор 👆
+  </div>
+
+  <button class="reset" id="resetBtn" style="display:none;">← выбрать заново</button>
+</div>
+
+<script>
+  const stage = document.getElementById('stage');
+  const nameInput = document.getElementById('nameInput');
+  const goBtn = document.getElementById('goBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  // Поддержка озвучки
+  const synth = window.speechSynthesis;
+  let currentUtterance = null;
+
+  const stories = {
+    veronika_artem: {
+      title: "Вероника и Артём",
+      text: "Тихая история о двух людях, которые встретились в дождливом городе. Шесть минут анимации о том, как случайность меняет жизнь. Она рисовала на полях тетрадей, он собирал старые пластинки. Они встретились на остановке, когда лил дождь, и с тех пор их истории переплелись в одну.",
+      duration: 6
+    }
+  };
+
+  const RUSLAN_REPLY = "Не, что-то перехотел, пока 😅";
+
+  // --- Озвучка ---
+  function speak(text) {
+    if (!synth) return;
+    stopSpeaking();
+    currentUtterance = new SpeechSynthesisUtterance(text);
+    currentUtterance.lang = 'ru-RU';
+    currentUtterance.rate = 0.95;
+    currentUtterance.pitch = 1;
+
+    // Пытаемся выбрать русский голос, если доступен
+    const voices = synth.getVoices();
+    const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+    if (ruVoice) currentUtterance.voice = ruVoice;
+
+    synth.speak(currentUtterance);
+  }
+
+  function stopSpeaking() {
+    if (synth) synth.cancel();
+  }
+
+  // --- Показ ---
+  function showError(msg) {
+    stopSpeaking();
+    stage.className = 'stage error';
+    stage.textContent = msg;
+    resetBtn.style.display = 'inline-block';
+  }
+
+  function showStory(story, minutes) {
+    stage.className = 'stage story';
+    stage.innerHTML = `
+      <div class="story-title">${story.title}</div>
+      <div class="story-text" id="storyText">${story.text}</div>
+      <div class="progress"><div class="progress-bar" id="bar"></div></div>
+      <div class="story-text" style="font-size:13px;color:#a78bfa;">Длительность: ~${minutes} мин</div>
+      <div class="controls">
+        <button class="ctrl-btn" id="speakBtn">🔊 Озвучить</button>
+        <button class="ctrl-btn" id="stopBtn">⏹ Стоп</button>
+      </div>
+    `;
+    resetBtn.style.display = 'inline-block';
+
+    const bar = document.getElementById('bar');
+    let p = 0;
+    const timer = setInterval(() => {
+      p += 1;
+      bar.style.width = p + '%';
+      if (p >= 100) clearInterval(timer);
+    }, 120);
+
+    document.getElementById('speakBtn').addEventListener('click', () => speak(story.text));
+    document.getElementById('stopBtn').addEventListener('click', stopSpeaking);
+  }
+
+  function handleChoice(key) {
+    if (key === 'ruslan') {
+      showError(RUSLAN_REPLY);
+      speak(RUSLAN_REPLY);
+      return;
+    }
+    if (stories[key]) {
+      showStory(stories[key], stories[key].duration);
+    }
+  }
+
+  document.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => handleChoice(btn.dataset.choice));
+  });
+
+  goBtn.addEventListener('click', () => {
+    const val = nameInput.value.trim().toLowerCase();
+
+    if (!val) {
+      stage.className = 'stage';
+      stage.textContent = 'Введи имя, пожалуйста 🙂';
+      return;
+    }
+
+    if (val === 'руслан') {
+      showError(RUSLAN_REPLY);
+      speak(RUSLAN_REPLY);
+      return;
+    }
+
+    if (val === 'вероника' || val === 'артём' || val === 'артем' || val === 'вероника и артём' || val === 'вероника и артем') {
+      showStory(stories.veronika_artem, stories.veronika_artem.duration);
+      return;
+    }
+
+    stage.className = 'stage';
+    stage.textContent = `Истории про «${nameInput.value.trim()}» пока нет, но она в планах ✨`;
+    resetBtn.style.display = 'inline-block';
+  });
+
+  resetBtn.addEventListener('click', () => {
+    stopSpeaking();
+    stage.className = 'stage';
+    stage.textContent = 'Пока ничего не выбрано. Жду твой выбор 👆';
+    resetBtn.style.display = 'none';
+    nameInput.value = '';
+  });
+
+  // Некоторые браузеры подгружают голоса асинхронно
+  if (synth && synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = () => {};
+  }
+</script>
+
+</body>
+  </html>
